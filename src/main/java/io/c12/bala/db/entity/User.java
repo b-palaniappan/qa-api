@@ -1,19 +1,23 @@
 package io.c12.bala.db.entity;
 
 import io.quarkus.mongodb.panache.common.MongoEntity;
-import io.quarkus.mongodb.panache.reactive.ReactivePanacheMongoEntity;
+import io.quarkus.mongodb.panache.reactive.ReactivePanacheMongoEntityBase;
+import org.bson.codecs.pojo.annotations.BsonId;
 
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
 
 @MongoEntity(collection = "userMaster")
-public class User extends ReactivePanacheMongoEntity {
+public class User extends ReactivePanacheMongoEntityBase {
 
+    @BsonId
+    public String id;
     public String firstName;
     public String lastName;
     public String email;
     public String status;
-    public Date createdAt;
-    public Date updatedAt;
-    public Date deletedAt;
+    public Instant createdAt;
+    public Instant updatedAt;
+    public LocalDateTime deletedAt;
 
 }
