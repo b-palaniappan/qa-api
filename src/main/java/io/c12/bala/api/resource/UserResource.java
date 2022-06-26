@@ -8,6 +8,7 @@ import io.smallrye.mutiny.Uni;
 import org.jboss.resteasy.reactive.RestStreamElementType;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
@@ -35,7 +36,7 @@ public class UserResource {
 
     @GET
     @Path("/{id}")
-    public Uni<User> getUserById(@PathParam("id")String id) {
+    public Uni<User> getUserById(@PathParam("id") String id) {
         return User.findById(id);
     }
 
@@ -46,12 +47,12 @@ public class UserResource {
         user.updatedAt = Instant.now();
         return User.persist(user)
                 .flatMap(i -> User.findById(user.id))
-                .map(c -> Response.created(URI.create(String.format("/api/users/%s", ((User)c).id))).entity(c).build());
+                .map(c -> Response.created(URI.create(String.format("/api/users/%s", ((User) c).id))).entity(c).build());
     }
 
     @PUT
     @Path("/{id}")
-    public Uni<User> updateUser(@PathParam("id")String id, User user) {
+    public Uni<Response> updateUser(@PathParam("id") String id, User user) {
         Uni<User> uniUpdateUser = User.findById(id);
         return uniUpdateUser.onItem().transform(updateUser -> {
             updateUser.firstName = user.firstName;
@@ -59,12 +60,12 @@ public class UserResource {
             updateUser.email = user.email;
             updateUser.updatedAt = Instant.now();
             return updateUser;
-        }).call(updateUser -> updateUser.persistOrUpdate());
+        }).call(updateUser -> updateUser.persistOrUpdate()).map(v -> Response.ok(v).build());
     }
 
     @PATCH
     @Path("/{id}")
-    public Uni<User> updatePartialUser(@PathParam("id")String id, User user) {
+    public Uni<Response> updatePartialUser(@PathParam("id") String id, User user) {
         Uni<User> uniUpdateUser = User.findById(id);
         return uniUpdateUser.onItem().transform(u -> {
             if (Objects.nonNull(user.firstName)) {
@@ -81,7 +82,17 @@ public class UserResource {
             }
             u.updatedAt = Instant.now();
             return u;
-        }).call(u -> u.persistOrUpdate());
+        }).call(u -> u.persistOrUpdate()).map(v -> Response.ok(v).build());
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Uni<Response> deleteUser(@PathParam("id") String id) {
+        Uni<User> uniDeleteUser = User.findById(id);
+        return uniDeleteUser.onItem().transform(u -> {
+            u.deletedAt = Instant.now();
+            return u;
+        }).call(u -> u.persistOrUpdate()).map(v -> Response.noContent().build());
     }
 
 }

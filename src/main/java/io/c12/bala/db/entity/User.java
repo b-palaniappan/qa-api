@@ -5,7 +5,6 @@ import io.quarkus.mongodb.panache.reactive.ReactivePanacheMongoEntityBase;
 import org.bson.codecs.pojo.annotations.BsonId;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @MongoEntity(collection = "userMaster")
 public class User extends ReactivePanacheMongoEntityBase {
@@ -18,6 +17,6 @@ public class User extends ReactivePanacheMongoEntityBase {
     public String status;
     public Instant createdAt;
     public Instant updatedAt;
-    public LocalDateTime deletedAt;
+    public Instant deletedAt;
 
 }
