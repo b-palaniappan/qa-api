@@ -1,12 +1,16 @@
 package io.c12.bala.api.resource;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import io.c12.bala.api.model.user.UserDto;
 import io.c12.bala.db.entity.User;
-import io.quarkus.panache.common.Page;
+import io.c12.bala.service.UserService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import lombok.extern.slf4j.Slf4j;
 import org.jboss.resteasy.reactive.RestStreamElementType;
 
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -27,11 +31,16 @@ import java.util.Objects;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RestStreamElementType(MediaType.APPLICATION_JSON)
+@Slf4j
+@RequestScoped
 public class UserResource {
 
+    @Inject
+    private UserService userService;
+
     @GET
-    public Multi<User> listAllUser(@QueryParam("pageIndex") int pageIndex, @QueryParam("pageSize") int pageSize) {
-        return User.findAll().page(Page.of(pageIndex, pageSize)).stream();
+    public Multi<UserDto> listAllUser(@QueryParam("pageIndex") int pageIndex, @QueryParam("pageSize") int pageSize) {
+        return userService.getAllUsersPage(pageIndex, pageSize);
     }
 
     @GET
