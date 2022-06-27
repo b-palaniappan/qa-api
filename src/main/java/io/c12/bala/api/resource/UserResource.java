@@ -1,8 +1,6 @@
 package io.c12.bala.api.resource;
 
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import io.c12.bala.api.model.user.UserDto;
-import io.c12.bala.db.entity.User;
 import io.c12.bala.service.UserService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -24,8 +22,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.time.Instant;
-import java.util.Objects;
 
 @Path("/v1/users")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -36,7 +32,7 @@ import java.util.Objects;
 public class UserResource {
 
     @Inject
-    private UserService userService;
+    UserService userService;
 
     @GET
     public Multi<UserDto> listAllUser(@QueryParam("pageIndex") int pageIndex, @QueryParam("pageSize") int pageSize) {
@@ -45,63 +41,32 @@ public class UserResource {
 
     @GET
     @Path("/{id}")
-    public Uni<User> getUserById(@PathParam("id") String id) {
-        return User.findById(id);
+    public Uni<UserDto> getUserById(@PathParam("id") String id) {
+        return userService.findUserById(id);
     }
 
     @POST
-    public Uni<Response> addUser(User user) {
-        user.id = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 25);
-        user.createdAt = Instant.now();
-        user.updatedAt = Instant.now();
-        return User.persist(user)
-                .flatMap(i -> User.findById(user.id))
-                .map(c -> Response.created(URI.create(String.format("/api/users/%s", ((User) c).id))).entity(c).build());
+    public Uni<Response> addUser(UserDto userDto) {
+        return userService.addUser(userDto)
+                .map(c -> Response.created(URI.create(String.format("/api/users/%s", c.getId()))).entity(c).build());
     }
 
     @PUT
     @Path("/{id}")
-    public Uni<Response> updateUser(@PathParam("id") String id, User user) {
-        Uni<User> uniUpdateUser = User.findById(id);
-        return uniUpdateUser.onItem().transform(updateUser -> {
-            updateUser.firstName = user.firstName;
-            updateUser.lastName = user.lastName;
-            updateUser.email = user.email;
-            updateUser.updatedAt = Instant.now();
-            return updateUser;
-        }).call(updateUser -> updateUser.persistOrUpdate()).map(v -> Response.ok(v).build());
+    public Uni<Response> updateUser(@PathParam("id") String id, UserDto userDto) {
+        return userService.updateUser(id, userDto).map(u -> Response.ok(u).build());
     }
 
     @PATCH
     @Path("/{id}")
-    public Uni<Response> updatePartialUser(@PathParam("id") String id, User user) {
-        Uni<User> uniUpdateUser = User.findById(id);
-        return uniUpdateUser.onItem().transform(u -> {
-            if (Objects.nonNull(user.firstName)) {
-                u.firstName = user.firstName;
-            }
-            if (Objects.nonNull(user.lastName)) {
-                u.lastName = user.lastName;
-            }
-            if (Objects.nonNull(user.email)) {
-                u.email = user.email;
-            }
-            if (Objects.nonNull(user.status)) {
-                u.status = user.status;
-            }
-            u.updatedAt = Instant.now();
-            return u;
-        }).call(u -> u.persistOrUpdate()).map(v -> Response.ok(v).build());
+    public Uni<Response> updatePartialUser(@PathParam("id") String id, UserDto userDto) {
+        return userService.partialUpdateUser(id, userDto).map(v -> Response.ok(v).build());
     }
 
     @DELETE
     @Path("/{id}")
     public Uni<Response> deleteUser(@PathParam("id") String id) {
-        Uni<User> uniDeleteUser = User.findById(id);
-        return uniDeleteUser.onItem().transform(u -> {
-            u.deletedAt = Instant.now();
-            return u;
-        }).call(u -> u.persistOrUpdate()).map(v -> Response.noContent().build());
+        return userService.deleteUser(id).map(v -> Response.noContent().build());
     }
 
 }
