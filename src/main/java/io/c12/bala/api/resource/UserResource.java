@@ -1,14 +1,18 @@
 package io.c12.bala.api.resource;
 
+import io.c12.bala.api.exception.UserNotFoundException;
 import io.c12.bala.api.model.user.UserDto;
 import io.c12.bala.service.UserService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import lombok.extern.slf4j.Slf4j;
+import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.RestStreamElementType;
+import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -34,6 +38,11 @@ public class UserResource {
     @Inject
     UserService userService;
 
+    @ServerExceptionMapper
+    public Uni<RestResponse<String>> mapException(UserNotFoundException ex) {
+        return Uni.createFrom().item(RestResponse.status(Response.Status.NOT_FOUND, "User Not Found"));
+    }
+
     @GET
     public Multi<UserDto> listAllUser(@QueryParam("pageIndex") int pageIndex, @QueryParam("pageSize") int pageSize) {
         return userService.getAllUsersPage(pageIndex, pageSize);
@@ -46,14 +55,14 @@ public class UserResource {
     }
 
     @POST
-    public Uni<Response> addUser(UserDto userDto) {
+    public Uni<Response> addUser(@Valid UserDto userDto) {
         return userService.addUser(userDto)
                 .map(c -> Response.created(URI.create(String.format("/api/users/%s", c.getId()))).entity(c).build());
     }
 
     @PUT
     @Path("/{id}")
-    public Uni<Response> updateUser(@PathParam("id") String id, UserDto userDto) {
+    public Uni<Response> updateUser(@PathParam("id") String id, @Valid UserDto userDto) {
         return userService.updateUser(id, userDto).map(u -> Response.ok(u).build());
     }
 

@@ -1,6 +1,7 @@
 package io.c12.bala.service;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import io.c12.bala.api.exception.UserNotFoundException;
 import io.c12.bala.api.model.constant.UserStatus;
 import io.c12.bala.api.model.user.UserDto;
 import io.c12.bala.db.entity.User;
@@ -27,8 +28,9 @@ public class UserService {
     }
 
     public Multi<UserDto> getAllUsersPage(int pageIndex, int pageSize) {
-        if (pageIndex <= 0) {
-            pageIndex = 1;
+        pageIndex = pageIndex - 1;  // page index start at zero.
+        if (pageIndex < 0) {
+            pageIndex = 0;
         }
         if (pageSize <= 0) {
             pageSize = 20;
@@ -38,8 +40,9 @@ public class UserService {
     }
 
     public Uni<UserDto> findUserById(String id) {
-        Uni<User> uniUser = User.findById(id);
-        return uniUser.onItem().transform(u -> modelMapper.map(u, UserDto.class));
+        Uni<User> uniUser = User.findActiveUserById(id);
+        uniUser.onItem().ifNull().failWith(new UserNotFoundException()).onFailure().transform(t -> new UserNotFoundException());
+        return uniUser.onItem().ifNotNull().transform(u -> modelMapper.map(u, UserDto.class));
     }
 
     public Uni<UserDto> addUser(UserDto userDto) {

@@ -3,6 +3,7 @@ package io.c12.bala.db.entity;
 import io.c12.bala.api.model.constant.UserStatus;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheMongoEntityBase;
+import io.smallrye.mutiny.Uni;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonId;
@@ -24,4 +25,7 @@ public class User extends ReactivePanacheMongoEntityBase {
     public Instant updatedAt;
     public Instant deletedAt;
 
+    public static Uni<User> findActiveUserById(String id) {
+        return find("id = ?1 and status = ?2", id, UserStatus.ACTIVE).firstResult();
+    }
 }
