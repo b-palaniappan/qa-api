@@ -1,14 +1,11 @@
 package io.c12.bala.api.resource;
 
-import io.c12.bala.api.exception.UserNotFoundException;
 import io.c12.bala.api.model.user.UserDto;
 import io.c12.bala.service.UserService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import lombok.extern.slf4j.Slf4j;
-import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.RestStreamElementType;
-import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -37,11 +34,6 @@ public class UserResource {
 
     @Inject
     UserService userService;
-
-    @ServerExceptionMapper
-    public Uni<RestResponse<String>> mapException(UserNotFoundException ex) {
-        return Uni.createFrom().item(RestResponse.status(Response.Status.NOT_FOUND, "User Not Found"));
-    }
 
     @GET
     public Multi<UserDto> listAllUser(@QueryParam("pageIndex") int pageIndex, @QueryParam("pageSize") int pageSize) {

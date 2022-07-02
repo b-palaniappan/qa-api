@@ -41,8 +41,8 @@ public class UserService {
 
     public Uni<UserDto> findUserById(String id) {
         Uni<User> uniUser = User.findActiveUserById(id);
-        uniUser.onItem().ifNull().failWith(new UserNotFoundException()).onFailure().transform(t -> new UserNotFoundException());
-        return uniUser.onItem().ifNotNull().transform(u -> modelMapper.map(u, UserDto.class));
+        return uniUser.onItem().ifNull().failWith(() -> new UserNotFoundException(id))
+                .onItem().ifNotNull().transform(u -> modelMapper.map(u, UserDto.class));
     }
 
     public Uni<UserDto> addUser(UserDto userDto) {

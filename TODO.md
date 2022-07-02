@@ -1,7 +1,7 @@
 # TODO List
 * ~~Add Service class and method~~
 * ~~Added Model Mapper~~
-* Add validation
+* ~~Add validation~~
 * Security
 * JWT
 * Global Exception handler
