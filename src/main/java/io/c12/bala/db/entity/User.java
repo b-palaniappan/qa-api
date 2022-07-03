@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonId;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @MongoEntity(collection = "userMaster")
 @Getter
@@ -21,6 +22,7 @@ public class User extends ReactivePanacheMongoEntityBase {
     public String lastName;
     public String email;
     public UserStatus status;
+    public LocalDate birthDate;
     public Instant createdAt;
     public Instant updatedAt;
     public Instant deletedAt;

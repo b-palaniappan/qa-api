@@ -11,3 +11,14 @@
 ```bash
 docker run --rm --name local-mongo -p 27017:27017 -d mongo
 ```
+
+## Generate RSA Keys
+* Generate RSA Public Private key.
+```bash
+openssl genrsa -out rsaPrivateKey.pem 2048
+openssl rsa -pubout -in rsaPrivateKey.pem -out publicKey.pem
+```
+* Convert private key to PKCS#8
+```bash
+openssl pkcs8 -topk8 -nocrypt -inform pem -in rsaPrivateKey.pem -outform pem -out privateKey.pem
+```
