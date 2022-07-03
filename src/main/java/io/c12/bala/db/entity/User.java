@@ -25,7 +25,8 @@ public class User extends ReactivePanacheMongoEntityBase {
     public Instant updatedAt;
     public Instant deletedAt;
 
-    public static Uni<User> findActiveUserById(String id) {
-        return find("id = ?1 and status = ?2", id, UserStatus.ACTIVE).firstResult();
+    public static Uni<User> findByIdAndStatusActive(String id) {
+        return find("_id = ?1 and status = ?2", id, UserStatus.ACTIVE).firstResult();
     }
+
 }

@@ -1,10 +1,15 @@
 package io.c12.bala.api.exception;
 
-public class UserNotFoundException extends RuntimeException {
+import java.util.function.Supplier;
 
-    public final String id;
+public class UserNotFoundException extends RuntimeException implements Supplier<UserNotFoundException> {
 
     public UserNotFoundException(String id) {
-        this.id = id;
+        super("User not found for id: " + id);
+    }
+
+    @Override
+    public UserNotFoundException get() {
+        return this;
     }
 }

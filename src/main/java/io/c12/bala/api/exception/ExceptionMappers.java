@@ -5,13 +5,15 @@ import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
 import javax.ws.rs.core.Response;
-import java.util.Map;
 
+/**
+ * Global Exception Mapper for handling exceptions.
+ */
 public class ExceptionMappers {
 
     @ServerExceptionMapper
-    public Uni<RestResponse<Map<String, String>>> mapException(UserNotFoundException ex) {
-        // TODO: create Error entity bean
-        return Uni.createFrom().item(RestResponse.status(Response.Status.NOT_FOUND, Map.of("errorMessage", "User Not Found for id: " + ex.id)));
+    public Uni<RestResponse<ApiError>> mapUserNotFoundException(UserNotFoundException ex) {
+        return Uni.createFrom().item(RestResponse.status(Response.Status.NOT_FOUND,
+                new ApiError(Response.Status.NOT_FOUND, ex.getMessage(), ex)));
     }
 }
