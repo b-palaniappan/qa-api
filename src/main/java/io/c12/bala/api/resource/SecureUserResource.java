@@ -16,6 +16,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import java.util.Map;
 
+/**
+ * Secure with JWT token. Only allow REST calls with valid JWT token.
+ */
 @Path("/v1/s/users")
 @RequestScoped
 @Slf4j
