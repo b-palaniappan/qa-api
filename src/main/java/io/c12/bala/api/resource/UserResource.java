@@ -5,6 +5,10 @@ import io.c12.bala.service.UserService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import lombok.extern.slf4j.Slf4j;
+import org.jboss.resteasy.reactive.ResponseStatus;
+import org.jboss.resteasy.reactive.RestPath;
+import org.jboss.resteasy.reactive.RestQuery;
+import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.RestStreamElementType;
 
 import javax.enterprise.context.RequestScoped;
@@ -17,14 +21,11 @@ import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.net.URI;
 
-@Path("/v1/users")
+@Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RestStreamElementType(MediaType.APPLICATION_JSON)
@@ -36,38 +37,42 @@ public class UserResource {
     UserService userService;
 
     @GET
-    public Multi<UserDto> listAllUser(@QueryParam("pageIndex") int pageIndex, @QueryParam("pageSize") int pageSize) {
+    public Multi<UserDto> listAllUser(@RestQuery("pageIndex") int pageIndex, @RestQuery("pageSize") int pageSize) {
         return userService.getAllUsersPage(pageIndex, pageSize);
     }
 
     @GET
     @Path("/{id}")
-    public Uni<UserDto> getUserById(@PathParam("id") String id) {
+    public Uni<UserDto> getUserById(@RestPath("id") String id) {
         return userService.findUserById(id);
     }
 
     @POST
-    public Uni<Response> addUser(@Valid UserDto userDto) {
+    @ResponseStatus(201)
+    public Uni<RestResponse> addUser(@Valid UserDto userDto) {
         return userService.addUser(userDto)
-                .map(c -> Response.created(URI.create(String.format("/api/users/%s", c.getId()))).entity(c).build());
+                .map(c -> RestResponse.ResponseBuilder.created(URI.create(String.format("/v1/users/%s", c.getId()))).entity(c).build());
     }
 
     @PUT
     @Path("/{id}")
-    public Uni<Response> updateUser(@PathParam("id") String id, @Valid UserDto userDto) {
-        return userService.updateUser(id, userDto).map(u -> Response.ok(u).build());
+    @ResponseStatus(200)
+    public Uni<UserDto> updateUser(@RestPath("id") String id, @Valid UserDto userDto) {
+        return userService.updateUser(id, userDto);
     }
 
     @PATCH
     @Path("/{id}")
-    public Uni<Response> updatePartialUser(@PathParam("id") String id, UserDto userDto) {
-        return userService.partialUpdateUser(id, userDto).map(v -> Response.ok(v).build());
+    @ResponseStatus(200)
+    public Uni<UserDto> updatePartialUser(@RestPath("id") String id, UserDto userDto) {
+        return userService.partialUpdateUser(id, userDto);
     }
 
     @DELETE
     @Path("/{id}")
-    public Uni<Response> deleteUser(@PathParam("id") String id) {
-        return userService.deleteUser(id).map(v -> Response.noContent().build());
+    @ResponseStatus(204)
+    public Uni<UserDto> deleteUser(@RestPath("id") String id) {
+        return userService.deleteUser(id);
     }
 
 }

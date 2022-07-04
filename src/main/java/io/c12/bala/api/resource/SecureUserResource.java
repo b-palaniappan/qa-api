@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Secure with JWT token. Only allow REST calls with valid JWT token.
  */
-@Path("/v1/s/users")
+@Path("/s/users")
 @RequestScoped
 @Slf4j
 @Produces(MediaType.APPLICATION_JSON)
