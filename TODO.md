@@ -4,7 +4,8 @@
 * ~~Add validation~~
 * Security
 * JWT
-* Global Exception handler
+* Global Exception handler. with validation error handler.
+* REST Client
 * ~~Swagger UI for REST API.~~
 
 ## Setup MongoDB in docker
