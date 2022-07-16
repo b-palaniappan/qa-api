@@ -1,5 +1,6 @@
 package io.c12.bala.api.model.user;
 
+import io.c12.bala.api.model.constant.UserStatus;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
@@ -20,7 +21,7 @@ public class UserDto {
     @NotBlank(message = "Email is required")
     @Email(message = "Valid email is required")
     private String email;
-    private String status;
+    private UserStatus status;
 
     @NotNull(message = "User Date of Birth is required")
     private LocalDate birthDate;
