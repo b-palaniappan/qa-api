@@ -19,6 +19,7 @@ dependencies {
     implementation 'io.quarkus:quarkus-smallrye-jwt'
     implementation 'io.quarkus:quarkus-smallrye-jwt-build'
     implementation 'io.quarkus:quarkus-rest-client-reactive-jackson'
+    implementation 'io.quarkiverse.vault:quarkus-vault'
 
     implementation 'com.aventrix.jnanoid:jnanoid:2.0.0'
     implementation 'org.modelmapper:modelmapper:3.1.0'

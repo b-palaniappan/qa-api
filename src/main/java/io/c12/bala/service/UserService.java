@@ -5,10 +5,14 @@ import io.c12.bala.api.exception.UserNotFoundException;
 import io.c12.bala.api.model.constant.UserStatus;
 import io.c12.bala.api.model.user.UserDto;
 import io.c12.bala.db.entity.User;
+import io.c12.bala.rest.client.GeoCodeService;
+import io.c12.bala.rest.client.model.geo.GeoCode;
 import io.quarkus.panache.common.Page;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.modelmapper.ModelMapper;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -22,6 +26,13 @@ public class UserService {
 
     @Inject
     ModelMapper modelMapper;
+
+    @Inject
+    @RestClient
+    GeoCodeService geoCodeService;
+
+    @ConfigProperty(name = "api-key")
+    String hereMapApiKey;
 
     UserService(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
@@ -52,6 +63,12 @@ public class UserService {
         user.createdAt = Instant.now();
         user.updatedAt = Instant.now();
         user.status = UserStatus.ACTIVE;
+
+        // Try GeoCode service
+        Uni<GeoCode> geoCodeSetUni = this.geoCodeService.getGeoCodeByAddress("5003 Hawthorne Dr West Des Moines Iowa", hereMapApiKey, "countryCode:USA");
+        // For logging only.
+        geoCodeSetUni.subscribe().with(result -> log.info("data - {}", result), failure -> log.error("failed with exception ", failure));
+
         return user.persist().map(u -> modelMapper.map(u, UserDto.class));
     }
 

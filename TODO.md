@@ -6,6 +6,7 @@
 * JWT
 * Global Exception handler. with validation error handler.
 * REST Client
+* ~~Move api key secret to Vault~~
 * ~~Swagger UI for REST API.~~
 
 ## Setup MongoDB in docker
@@ -22,4 +23,9 @@ openssl rsa -pubout -in rsaPrivateKey.pem -out publicKey.pem
 * Convert private key to PKCS#8
 ```bash
 openssl pkcs8 -topk8 -nocrypt -inform pem -in rsaPrivateKey.pem -outform pem -out privateKey.pem
+```
+
+## Vault configuration
+```bash
+vault kv put secret/qa-service/api.hereMap api-key=<Here_map_api_key>
 ```
