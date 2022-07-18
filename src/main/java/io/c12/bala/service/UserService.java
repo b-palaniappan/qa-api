@@ -20,6 +20,8 @@ import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Objects;
 
+import static io.c12.bala.api.config.ApiConstants.USER_UNIQUE_ID_PREFIX;
+
 @ApplicationScoped
 @Slf4j
 public class UserService {
@@ -59,7 +61,7 @@ public class UserService {
     public Uni<UserDto> addUser(UserDto userDto) {
         User user = modelMapper.map(userDto, User.class);
         // Create nanoid
-        user.id = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 25);
+        user.id = USER_UNIQUE_ID_PREFIX + NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 25);
         user.createdAt = Instant.now();
         user.updatedAt = Instant.now();
         user.status = UserStatus.ACTIVE;

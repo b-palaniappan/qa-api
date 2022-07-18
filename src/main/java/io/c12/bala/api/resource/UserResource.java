@@ -1,10 +1,20 @@
 package io.c12.bala.api.resource;
 
+import io.c12.bala.api.exception.ApiError;
 import io.c12.bala.api.model.user.UserDto;
 import io.c12.bala.service.UserService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.headers.Header;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.jboss.resteasy.reactive.ResponseStatus;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
@@ -37,19 +47,34 @@ public class UserResource {
     UserService userService;
 
     @GET
-    public Multi<UserDto> listAllUser(@RestQuery("pageIndex") int pageIndex, @RestQuery("pageSize") int pageSize) {
+    @Operation(summary = "Get list of all users", description = "Get list of all users paginated by pageIndex and pageSize")
+    @APIResponse(responseCode = "200", description = "List of paginated users list")
+    public Multi<UserDto> listAllUser(@Parameter(name = "pageIndex", description = "Page Index or Page number for pagination") @RestQuery("pageIndex") int pageIndex,
+                                      @Parameter(name = "pageSize", description = "Page Size for pagination") @RestQuery("pageSize") int pageSize) {
         return userService.getAllUsersPage(pageIndex, pageSize);
     }
 
     @GET
     @Path("/{id}")
+    @Operation(summary = "Get user by Id", description = "Get one user by unique user id")
+    @APIResponses(value = {
+            @APIResponse(responseCode = "200", description = "Get user by id successfully", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = UserDto.class))},
+                    headers = @Header(name = "Location", description = "partial url of the user created", schema = @Schema(type = SchemaType.STRING))),
+            @APIResponse(responseCode = "404", description = "User not found for requested id", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = ApiError.class))})
+    })
     public Uni<UserDto> getUserById(@RestPath("id") String id) {
         return userService.findUserById(id);
     }
 
     @POST
     @ResponseStatus(201)
-    public Uni<RestResponse> addUser(@Valid UserDto userDto) {
+    @Operation(summary = "Create a user", description = "Create or add a new user to system")
+    @APIResponses(value = {
+            @APIResponse(responseCode = "201", description = "User added successfully", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = UserDto.class))},
+                    headers = @Header(name = "Location", description = "partial url of the user created", schema = @Schema(type = SchemaType.STRING))),
+            @APIResponse(responseCode = "400", description = "Request payload validation failed", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = ApiError.class))})
+    })
+    public Uni<RestResponse> addUser(@RequestBody(name = "user information", description = "User information to be added", required = true) @Valid UserDto userDto) {
         return userService.addUser(userDto)
                 .map(c -> RestResponse.ResponseBuilder.created(URI.create(String.format("/v1/users/%s", c.getId()))).entity(c).build());
     }
