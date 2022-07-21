@@ -4,10 +4,11 @@
 * ~~Add validation~~
 * Security
 * JWT
-* Global Exception handler. with validation error handler.
+* Global Exception handler. with validation error handler
 * REST Client
 * ~~Move api key secret to Vault~~
 * ~~Swagger UI for REST API.~~
+* Add integration and unit testing
 
 ## Setup MongoDB in docker
 ```bash
