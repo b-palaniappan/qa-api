@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Objects;
 
+import static io.c12.bala.api.config.ApiConstants.NANOID_DEFAULT_ALPHABET;
 import static io.c12.bala.api.config.ApiConstants.USER_UNIQUE_ID_PREFIX;
 
 @ApplicationScoped
@@ -55,13 +56,13 @@ public class UserService {
     public Uni<UserDto> findUserById(String id) {
         Uni<User> uniUser = User.findByIdAndStatusActive(id);
         return uniUser.onItem().ifNull().failWith(() -> new UserNotFoundException(id))
-                .onItem().ifNotNull().transform(u -> modelMapper.map(u, UserDto.class));
+            .onItem().ifNotNull().transform(u -> modelMapper.map(u, UserDto.class));
     }
 
     public Uni<UserDto> addUser(UserDto userDto) {
         User user = modelMapper.map(userDto, User.class);
         // Create nanoid
-        user.id = USER_UNIQUE_ID_PREFIX + NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 25);
+        user.id = USER_UNIQUE_ID_PREFIX + NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NANOID_DEFAULT_ALPHABET, 25);
         user.createdAt = Instant.now();
         user.updatedAt = Instant.now();
         user.status = UserStatus.ACTIVE;
@@ -75,7 +76,7 @@ public class UserService {
     }
 
     public Uni<UserDto> updateUser(String id, UserDto userDto) {
-        Uni<User> uniUpdateUser = User.findById(id);
+        Uni<User> uniUpdateUser = User.findByIdAndStatusActive(id).onItem().ifNull().failWith(() -> new UserNotFoundException(id));
         return uniUpdateUser.onItem().transform(user -> {
             user.firstName = userDto.getFirstName();
             user.lastName = userDto.getLastName();
@@ -86,7 +87,7 @@ public class UserService {
     }
 
     public Uni<UserDto> partialUpdateUser(String id, UserDto userDto) {
-        Uni<User> uniUser = User.findById(id);
+        Uni<User> uniUser = User.findByIdAndStatusActive(id).onItem().ifNull().failWith(() -> new UserNotFoundException(id));
         return uniUser.onItem().transform(u -> {
             if (Objects.nonNull(userDto.getFirstName())) {
                 u.firstName = userDto.getFirstName();
@@ -103,12 +104,14 @@ public class UserService {
     }
 
     public Uni<UserDto> deleteUser(String id) {
-        Uni<User> uniUser = User.findById(id);
-        return uniUser.onItem().transform(u -> {
-            u.deletedAt = Instant.now();
-            u.status = UserStatus.TERMINATED;
-            return u;
-        }).call(u -> u.persistOrUpdate()).map(u -> modelMapper.map(u, UserDto.class));
+        Uni<User> uniUser = User.findByIdAndStatusActive(id);
+        return uniUser.onItem().ifNull().fail()
+            .onItem().ifNotNull().transform(u -> {
+                u.deletedAt = Instant.now();
+                u.status = UserStatus.TERMINATED;
+                return u;
+            }).call(u -> u.persistOrUpdate()).map(u -> modelMapper.map(u, UserDto.class))
+            .onFailure().recoverWithNull();
     }
 
 }
