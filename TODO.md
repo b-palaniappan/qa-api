@@ -30,3 +30,7 @@ openssl pkcs8 -topk8 -nocrypt -inform pem -in rsaPrivateKey.pem -outform pem -ou
 ```bash
 vault kv put secret/qa-service/api.hereMap api-key=<Here_map_api_key>
 ```
+
+## Something's to remember
+* store JWTs inside an httpOnly cookie
+* OWASP docs on [jwt](https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.md)
