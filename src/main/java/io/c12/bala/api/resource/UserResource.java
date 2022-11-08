@@ -58,8 +58,7 @@ public class UserResource {
     @Path("/{id}")
     @Operation(summary = "Get user by Id", description = "Get one user by unique user id")
     @APIResponses(value = {
-            @APIResponse(responseCode = "200", description = "Get user by id successfully", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = UserDto.class))},
-                    headers = @Header(name = "Location", description = "partial url of the user created", schema = @Schema(type = SchemaType.STRING))),
+            @APIResponse(responseCode = "200", description = "Get user by id successfully", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = UserDto.class))}),
             @APIResponse(responseCode = "404", description = "User not found for requested id", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = ApiError.class))})
     })
     public Uni<UserDto> getUserById(@RestPath("id") String id) {
@@ -82,6 +81,11 @@ public class UserResource {
     @PUT
     @Path("/{id}")
     @ResponseStatus(200)
+    @Operation(summary = "Update user", description = "Update whole user by user id.")
+    @APIResponses(value = {
+        @APIResponse(responseCode = "200", description = "Updated user successfully", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = UserDto.class))}),
+        @APIResponse(responseCode = "400", description = "Request payload validation failed", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = ApiError.class))})
+    })
     public Uni<UserDto> updateUser(@RestPath("id") String id, @Valid UserDto userDto) {
         return userService.updateUser(id, userDto);
     }
@@ -89,6 +93,11 @@ public class UserResource {
     @PATCH
     @Path("/{id}")
     @ResponseStatus(200)
+    @Operation(summary = "Patch user", description = "Update or or more param of user by User id")
+    @APIResponses(value = {
+        @APIResponse(responseCode = "200", description = "Updated user successfully", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = UserDto.class))}),
+        @APIResponse(responseCode = "400", description = "Request payload validation failed", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = ApiError.class))})
+    })
     public Uni<UserDto> updatePartialUser(@RestPath("id") String id, UserDto userDto) {
         return userService.partialUpdateUser(id, userDto);
     }
@@ -96,6 +105,10 @@ public class UserResource {
     @DELETE
     @Path("/{id}")
     @ResponseStatus(204)
+    @Operation(summary = "Delete a user", description = "Delete a user by user id")
+    @APIResponses(value = {
+        @APIResponse(responseCode = "204", description = "Delete user successfully", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = UserDto.class))})
+    })
     public Uni<UserDto> deleteUser(@RestPath("id") String id) {
         return userService.deleteUser(id);
     }
