@@ -1,4 +1,8 @@
-# qa-api Project
+# Quarkus API
+
+![GitHub](https://img.shields.io/github/license/b-palaniappan/qa-api)
+![GitHub top language](https://img.shields.io/github/languages/top/b-palaniappan/qa-api)
+![GitHub last commit](https://img.shields.io/github/last-commit/b-palaniappan/qa-api)
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
