@@ -1,14 +1,14 @@
 # TODO List
-* ~~Add Service class and method~~
-* ~~Added Model Mapper~~
-* ~~Add validation~~
-* Security
-* JWT
-* Global Exception handler. with validation error handler
-* REST Client
-* ~~Move api key secret to Vault~~
-* ~~Swagger UI for REST API.~~
-* Add integration and unit testing
+- [x] Add Service class and method
+- [x] Added Model Mapper
+- [x] Add validation
+- [ ] Security
+- [ ] JWT
+- [x] Global Exception handler. with validation error handler
+- [x] REST Client
+- [x] Move api key secret to Vault
+- [x] Swagger UI for REST API.
+- [ ] Add integration and unit testing
 
 ## Setup MongoDB in docker
 ```bash

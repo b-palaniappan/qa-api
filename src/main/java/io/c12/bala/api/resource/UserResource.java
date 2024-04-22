@@ -58,8 +58,8 @@ public class UserResource {
     @Path("/{id}")
     @Operation(summary = "Get user by Id", description = "Get one user by unique user id")
     @APIResponses(value = {
-            @APIResponse(responseCode = "200", description = "Get user by id successfully", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = UserDto.class))}),
-            @APIResponse(responseCode = "404", description = "User not found for requested id", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = ApiError.class))})
+        @APIResponse(responseCode = "200", description = "Get user by id successfully", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = UserDto.class))}),
+        @APIResponse(responseCode = "404", description = "User not found for requested id", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = ApiError.class))})
     })
     public Uni<UserDto> getUserById(@RestPath("id") String id) {
         return userService.findUserById(id);
@@ -69,13 +69,13 @@ public class UserResource {
     @ResponseStatus(201)
     @Operation(summary = "Create a user", description = "Create or add a new user to system")
     @APIResponses(value = {
-            @APIResponse(responseCode = "201", description = "User added successfully", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = UserDto.class))},
-                    headers = @Header(name = "Location", description = "partial url of the user created", schema = @Schema(type = SchemaType.STRING))),
-            @APIResponse(responseCode = "400", description = "Request payload validation failed", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = ApiError.class))})
+        @APIResponse(responseCode = "201", description = "User added successfully", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = UserDto.class))},
+            headers = @Header(name = "Location", description = "partial url of the user created", schema = @Schema(type = SchemaType.STRING))),
+        @APIResponse(responseCode = "400", description = "Request payload validation failed", content = {@Content(schema = @Schema(type = SchemaType.OBJECT, implementation = ApiError.class))})
     })
     public Uni<RestResponse> addUser(@RequestBody(name = "user information", description = "User information to be added", required = true) @Valid UserDto userDto) {
         return userService.addUser(userDto)
-                .map(c -> RestResponse.ResponseBuilder.created(URI.create(String.format("/v1/users/%s", c.getId()))).entity(c).build());
+            .map(c -> RestResponse.ResponseBuilder.created(URI.create(String.format("/v1/users/%s", c.getId()))).entity(c).build());
     }
 
     @PUT
